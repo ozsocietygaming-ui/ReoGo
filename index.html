@@ -69,12 +69,18 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
   <h2 class="text-xl font-extrabold" data-i="n2"></h2><div id="filters" class="flex gap-1 flex-wrap"></div>
  </div>
  <div class="grid md:grid-cols-2 gap-4" id="tasks"></div>
- <h2 class="text-xl font-extrabold mt-10 mb-3" data-i="pollH"></h2>
+</section>
+
+<!-- POLLS TAB -->
+<section id="v2p" class="hidden">
+ <h2 class="text-xl font-extrabold mb-3" data-i="pollH"></h2>
  <div id="admPoll" class="card p-4 mb-4 hidden">
   <input id="pQ" class="inp mb-2" data-p="pq"><textarea id="pO" rows="3" class="inp" data-p="po"></textarea>
-  <button class="btn mt-2" onclick="addPoll()" data-i="publish"></button>
+  <div class="flex gap-2 mt-2 items-center"><input id="pDur" type="number" min="1" value="24" class="inp !w-24" data-p="dur"><select id="pU" class="inp !w-auto"></select><button class="btn" onclick="addPoll()" data-i="publish"></button></div>
  </div>
  <div class="grid md:grid-cols-2 gap-4" id="polls"></div>
+ <h2 class="text-xl font-extrabold mt-10 mb-3" data-i="endedH"></h2>
+ <div class="grid md:grid-cols-2 gap-4" id="pollsEnded"></div>
 </section>
 
 <!-- TAB 3 -->
@@ -106,6 +112,34 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
  <div id="admSug" class="hidden mt-6">
   <div class="flex justify-between items-center mb-2"><h3 class="font-bold" data-i="inbox"></h3><button class="chip" onclick="clearSug()" data-i="clear"></button></div>
   <div id="sugList" class="grid md:grid-cols-2 gap-3"></div>
+ </div>
+</section>
+
+<!-- DISABILITY TAB -->
+<section id="v5" class="hidden">
+ <h2 class="text-xl font-extrabold mb-1" data-i="n6"></h2><p class="text-[var(--mut)] mb-4" data-i="dSub"></p>
+ <div class="card p-4" id="dCit">
+  <div id="dStart">
+   <p class="text-sm mb-3"><i class="fa-solid fa-shield-halved text-[var(--olive)]"></i> <span data-i="dNote"></span></p>
+   <button class="btn" onclick="dOpen()"><i class="fa-solid fa-comments"></i> <span data-i="dBtn"></span></button>
+   <form id="dForm" class="hidden mt-4 grid md:grid-cols-2 gap-3" onsubmit="return dSend(event)">
+    <input id="dN" required class="inp" data-p="dName"><input id="dK" class="inp" data-p="contact">
+    <label class="text-sm md:col-span-2"><span data-i="dId"></span> *<input id="dF" type="file" accept="image/*" required class="block mt-1"></label>
+    <textarea id="dM" rows="2" class="inp md:col-span-2" data-p="dMsg1"></textarea>
+    <label class="text-sm md:col-span-2"><input type="checkbox" required> <span data-i="dCons"></span></label>
+    <div class="md:col-span-2"><button class="btn" data-i="dSubmit"></button></div>
+   </form>
+  </div>
+  <div id="dChatC" class="hidden">
+   <div class="flex justify-between mb-2"><span id="dSt" class="chip"></span><button id="dNewB" class="chip hidden" onclick="dNew()" data-i="newReq"></button></div>
+   <div id="cMsgs" class="h-64 overflow-y-auto bg-[#FAF8F5] rounded-xl p-3 mb-2"></div>
+   <div class="flex gap-2"><input id="cIn" class="inp" data-p="typeMsg" onkeydown="event.key==='Enter'&&cSend()"><button id="cBtn" class="btn" onclick="cSend()"><i class="fa-solid fa-paper-plane rtl:-scale-x-100"></i></button></div>
+  </div>
+ </div>
+ <div id="dAdm" class="hidden grid md:grid-cols-3 gap-4">
+  <div><h3 class="font-bold mb-2" data-i="reqs"></h3><div id="dList" class="space-y-2"></div></div>
+  <div id="aPanel" class="card p-3 md:col-span-2 hidden"><div id="aInfo"></div><div id="aMsgs" class="h-56 overflow-y-auto bg-[#FAF8F5] rounded-xl p-3 mb-2"></div>
+   <div class="flex gap-2"><input id="mIn" class="inp" data-p="typeMsg" onkeydown="event.key==='Enter'&&mSend()"><button id="mBtn" class="btn" onclick="mSend()"><i class="fa-solid fa-paper-plane rtl:-scale-x-100"></i></button></div></div>
  </div>
 </section>
 </main>
@@ -150,7 +184,15 @@ send:['إرسال','Envoyer','Send'],sent:['شكرًا! تم إرسال اقتر
 rev:['تمت المراجعة','Examiné','Reviewed'],mark:['تمت المراجعة ✓','Marquer examiné','Mark reviewed'],sure:['هل أنت متأكد؟','Confirmer ?','Are you sure?'],
 foot:['© بلديتي رأس الوادي — حملة محمد بوضياف','© Baladiyati Ras El Oued — Campagne Mohamed Boudiaf','© Baladiyati Ras El Oued — Mohamed Boudiaf campaign'],
 addAch:['نشر إنجاز','Publier une réalisation','Post an accomplishment'],img1:['صورة (اختيارية) — «قبل» إن وُجدت','Photo (facultative) — « avant » si applicable','Photo (optional) — “before” if any'],img2:['صورة ثانية (اختيارية) — «بعد»','2e photo (facultative) — « après »','2nd photo (optional) — “after”'],
-k5:['إنجازات منشورة','Réalisations','Accomplishments'],noAch:['لا توجد إنجازات منشورة بعد','Aucune réalisation publiée','No accomplishments posted yet'],pollErr:['أدخل سؤالًا وخيارين على الأقل (كل خيار في سطر)','Saisissez une question et 2 options minimum (une par ligne)','Enter a question and at least 2 options (one per line)']};
+k5:['إنجازات منشورة','Réalisations','Accomplishments'],noAch:['لا توجد إنجازات منشورة بعد','Aucune réalisation publiée','No accomplishments posted yet'],npoll:['استطلاعات','Sondages','Polls'],n6:['ذوو الاحتياجات الخاصة','Personnes en situation de handicap','People with disabilities'],dur:['المدة','Durée','Duration'],uh:['ساعات','heures','hours'],ud:['أيام','jours','days'],um:['دقائق','minutes','minutes'],
+noAct:['لا توجد استطلاعات نشطة','Aucun sondage actif','No active polls'],noEnd:['لا توجد استطلاعات منتهية','Aucun sondage terminé','No ended polls'],endedH:['الاستطلاعات المنتهية','Sondages terminés','Ended polls'],endedL:['انتهى في','Terminé le','Ended'],
+dSub:['تواصل مباشرة مع رئيس البلدية','Échangez directement avec le maire','Talk directly with the mayor'],dNote:['صورة بطاقتك تُستعمل للتحقق من طلبك فقط ولا يطّلع عليها إلا فريق رئيس البلدية.','Votre pièce d’identité sert uniquement à vérifier votre demande et n’est vue que par l’équipe du maire.','Your ID is used only to verify your request and is seen only by the mayor’s team.'],
+dBtn:['تحدث مع رئيس بلديتك','Discuter avec votre maire','Chat with your mayor'],dName:['الاسم الكامل','Nom complet','Full name'],dId:['صورة بطاقة التعريف / بطاقة المعاق','Photo de la carte d’identité / carte de handicap','Photo of your ID / disability card'],dMsg1:['رسالتك الأولى (اختياري)','Votre premier message (facultatif)','Your first message (optional)'],
+dCons:['أوافق على إرسال صورة بطاقتي إلى فريق رئيس البلدية','J’accepte d’envoyer ma pièce à l’équipe du maire','I agree to send my ID to the mayor’s team'],dSubmit:['إرسال الطلب','Envoyer la demande','Send request'],
+wait:['⏳ في انتظار قبول رئيس البلدية','⏳ En attente du maire','⏳ Waiting for the mayor'],live:['🟢 المحادثة مفتوحة','🟢 Discussion ouverte','🟢 Chat open'],closedT:['المحادثة مغلقة','Discussion terminée','Chat closed'],pend:['قيد الانتظار','En attente','Pending'],
+newReq:['طلب جديد','Nouvelle demande','New request'],typeMsg:['اكتب رسالة…','Écrire un message…','Type a message…'],reqs:['طلبات المحادثة','Demandes de discussion','Chat requests'],noReq:['لا توجد طلبات','Aucune demande','No requests'],
+start:['بدء المحادثة','Démarrer','Start chat'],close:['إنهاء','Clore','End chat'],delId:['حذف صورة البطاقة','Supprimer la pièce','Delete ID photo'],idGone:['تم حذف صورة البطاقة','Pièce supprimée','ID photo deleted'],
+pollErr:['أدخل سؤالًا وخيارين على الأقل (كل خيار في سطر)','Saisissez une question et 2 options minimum (une par ligne)','Enter a question and at least 2 options (one per line)']};
 const PIL=[['تحسين البنية التحتية','Infrastructure','Infrastructure'],['دعم الشباب والرياضة','Jeunesse & sport','Youth & Sports'],['حماية البيئة والفضاءات الخضراء','Environnement & espaces verts','Environment & Green Spaces'],['قرب الإدارة من المواطن','Administration de proximité','Administration Closer to Citizens'],['تعزيز الأمن والاستقرار','Sécurité & stabilité','Security & Stability']];
 const ICO=['road','futbol','leaf','handshake','shield-halved'];
 const CRED=[
@@ -166,13 +208,13 @@ const ST={planned:'#8A8078',progress:'#B5694B',done:'#7A8450'};
 function applyLang(){
  document.documentElement.lang=LG[I];document.documentElement.dir=I?'ltr':'rtl';localStorage.lang=LG[I];
  $$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('[data-p]').forEach(e=>e.placeholder=t(e.dataset.p)||({sName:1})&&T[e.dataset.p]?t(e.dataset.p):'');
- $('#tabs').innerHTML=[0,1,2,3].map(i=>`<button class="tab whitespace-nowrap ${i==TAB?'on':''}" onclick="go(${i})">${t('n'+(i+1))}</button>`).join('');
+ $('#tabs').innerHTML=['n1','n2','npoll','n3','n4','n6'].map((k,i)=>`<button class="tab whitespace-nowrap ${i==TAB?'on':''}" onclick="go(${i})">${t(k)}</button>`).join('');
  $('#langs').innerHTML=['عربي','Français','English'].map((l,i)=>`<button class="px-2 py-1 ${i==I?'bg-[var(--acc)] text-white':''}" onclick="setL(${i})">${l}</button>`).join('');
  const opt=(a,f)=>a.map((x,i)=>`<option value="${f?f[i]:i}">${x}</option>`).join('');
  const keep=(s,h)=>{const v=$(s).value;$(s).innerHTML=h;if(v)$(s).value=v};
- keep('#tCat',opt(PIL.map(p=>p[I])));keep('#sC',opt(PIL.map(p=>p[I])));keep('#aCat',opt(PIL.map(p=>p[I])));
+ keep('#tCat',opt(PIL.map(p=>p[I])));keep('#sC',opt(PIL.map(p=>p[I])));keep('#aCat',opt(PIL.map(p=>p[I])));keep('#pU',opt([t('uh'),t('ud'),t('um')],[3600000,86400000,60000]));
  keep('#tTf',opt(['daily','weekly','monthly','term'].map(t),['daily','weekly','monthly','term']));keep('#tSt',opt(['planned','progress','done'].map(t),['planned','progress','done']));
- $('#admBtn span').textContent=ADM?t('out'):t('admin');
+ $('#admBtn span').textContent=ADM?t('out'):t('admin');admWatch();
  $('#creds').innerHTML=CRED.map(c=>`<div class="card p-5"><div class="text-2xl mb-2" style="color:var(--acc)"><i class="fa-solid ${c[0].slice(3)}"></i></div><h3 class="font-bold mb-2">${c[1][I]}</h3><ul class="space-y-1 text-sm">${c[2][I].map(x=>`<li><i class="fa-solid fa-circle-check text-[var(--olive)] me-1"></i>${x}</li>`).join('')}</ul></div>`).join('');
  $('#pillars').innerHTML=PIL.map((p,i)=>`<div class="card p-4 text-center"><div class="text-3xl mb-2" style="color:var(--olive)"><i class="fa-solid fa-${ICO[i]}"></i></div><div class="font-semibold text-sm">${p[I]}</div></div>`).join('');
  $('#filters').innerHTML=['all','planned','progress','done'].map(f=>`<button class="chip !py-1 ${f==FIL?'!bg-[var(--acc)] !text-white':''}" onclick="FIL='${f}';window.render()">${t(f)}</button>`).join('');
@@ -195,10 +237,14 @@ window.render=function(){
   <div class="bar"><i style="width:${x.pr}%"></i></div><div class="text-xs mt-1 font-semibold">${x.pr}%</div>
   <div class="flex items-center justify-between mt-2"><div>${[1,2,3,4,5].map(s=>`<button onclick="rate('${id}',${s})" class="${s<=my?'text-[var(--acc)]':'text-[#cfc6b8]'}"><i class="fa-solid fa-star"></i></button>`).join('')} <span class="text-xs text-[var(--mut)]">${a?a.toFixed(1)+' ('+n+')':''}</span></div>
   ${ADM?`<div class="text-sm"><button class="chip" onclick="editTask('${id}')">${t('edit')}</button> <button class="chip" onclick="delTask('${id}')">${t('del')}</button></div>`:''}</div></div>`}).join(''):`<p class="text-[var(--mut)]">${t('empty')}</p>`;
- $('#polls').innerHTML=Object.entries(POLLS).map(([id,p])=>{const v=p.votes||{},tot=Object.values(v).reduce((a,b)=>a+b,0),did=localStorage['v_'+id];
-  return `<div class="card p-4"><h3 class="font-bold mb-3">${esc(tx(p.q))}</h3>${p.o.map((o,i)=>{const c=v[i]||0,pc=tot?Math.round(c*100/tot):0;
-  return `<button ${did?'disabled':''} onclick="vote('${id}',${i})" class="block w-full text-start mb-2 relative bg-white rounded-xl overflow-hidden"><span class="absolute inset-y-0 start-0 opacity-30" style="width:${pc}%;background:var(--olive)"></span><span class="relative flex justify-between px-3 py-2 text-sm"><span>${esc(tx(o))}</span><b>${pc}%</b></span></button>`}).join('')}
-  <div class="text-xs text-[var(--mut)] flex justify-between"><span>${tot} ${t('voted')}</span>${ADM?`<button onclick="delPoll('${id}')" class="underline">${t('del')}</button>`:''}</div></div>`}).join('');
+ const live=p=>!p.end||p.end>Date.now(),pe=Object.entries(POLLS);
+ const pc=(id,p)=>{const v=p.votes||{},tot=Object.values(v).reduce((a,b)=>a+b,0),lv=live(p),did=localStorage['v_'+id];
+  return `<div class="card p-4"><h3 class="font-bold mb-3">${esc(tx(p.q))}</h3>${p.o.map((o,i)=>{const c=v[i]||0,pp=tot?Math.round(c*100/tot):0;
+  return `<button ${did||!lv?'disabled':''} onclick="vote('${id}',${i})" class="block w-full text-start mb-2 relative bg-white rounded-xl overflow-hidden"><span class="absolute inset-y-0 start-0 opacity-30" style="width:${pp}%;background:var(--olive)"></span><span class="relative flex justify-between px-3 py-2 text-sm"><span>${esc(tx(o))}</span><b>${pp}%</b></span></button>`}).join('')}
+  <div class="text-xs text-[var(--mut)] flex justify-between gap-2"><span>${tot} ${t('voted')}${p.end?' · '+(lv?`⏳ <b data-end="${p.end}"></b>`:t('endedL')+' '+new Date(p.end).toLocaleString()):''}</span>${ADM?`<button onclick="delPoll('${id}')" class="underline">${t('del')}</button>`:''}</div></div>`};
+ $('#polls').innerHTML=pe.filter(([,p])=>live(p)).map(([id,p])=>pc(id,p)).join('')||`<p class="text-[var(--mut)]">${t('noAct')}</p>`;
+ $('#pollsEnded').innerHTML=pe.filter(([,p])=>!live(p)).sort((a,b)=>b[1].end-a[1].end).map(([id,p])=>pc(id,p)).join('')||`<p class="text-[var(--mut)]">${t('noEnd')}</p>`;
+ tick();renderDis();
  const all=Object.values(TASKS),dn=all.filter(x=>x.status=='done').length,av=all.length?Math.round(all.reduce((a,x)=>a+x.pr,0)/all.length):0;
  $('#counters').innerHTML=[[all.length,'k1'],[dn,'k2'],[Object.keys(ACH).length,'k5'],[Object.keys(SUG).length||'—','k4']].map(k=>`<div class="card p-4 text-center"><div class="text-3xl font-extrabold" style="color:var(--acc)">${k[0]}</div><div class="text-xs text-[var(--mut)]">${t(k[1])}</div></div>`).join('');
  const ac=Object.entries(ACH).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
@@ -209,20 +255,20 @@ window.render=function(){
 };
 // ---- actions
 window.rate=(id,n)=>set(ref(db,`ratings/${id}/${uid}`),n);
-window.vote=(id,i)=>{localStorage['v_'+id]=1;runTransaction(ref(db,`polls/${id}/votes/${i}`),v=>(v||0)+1)};
+window.vote=(id,i)=>{const e=POLLS[id]?.end;if(e&&e<=Date.now())return render();localStorage['v_'+id]=1;runTransaction(ref(db,`polls/${id}/votes/${i}`),v=>(v||0)+1)};
 window.saveTask=async()=>{if(!tTitle.value.trim())return;const id=tId.value||push(ref(db,'tasks')).key;
  await set(ref(db,'tasks/'+id),{title:tTitle.value.trim(),cat:+tCat.value,tf:tTf.value,status:tSt.value,pr:+tPr.value,cap:tCap.value,ts:Date.now()});resetTask()};
 window.resetTask=()=>{tId.value=tTitle.value=tCap.value='';tPr.value=0;tPv.textContent='0%'};
 window.editTask=id=>{const x=TASKS[id];tId.value=id;tTitle.value=tx(x.title);tCap.value=tx(x.cap);tCat.value=x.cat;tTf.value=x.tf;tSt.value=x.status;tPr.value=x.pr;tPv.textContent=x.pr+'%';scrollTo({top:0,behavior:'smooth'})};
 window.delTask=id=>confirm(t('sure'))&&remove(ref(db,'tasks/'+id));
-window.addPoll=async()=>{const q=pQ.value.trim(),o=pO.value.split(/[\n|;]+/).map(x=>x.trim()).filter(Boolean);if(!q||o.length<2)return alert(t('pollErr'));
- await set(push(ref(db,'polls')),{q,o,votes:Object.fromEntries(o.map((_,i)=>[i,0])),ts:Date.now()});pQ.value=pO.value='';alert('✓')};
+window.addPoll=async()=>{const q=pQ.value.trim(),o=pO.value.split(/[\n|;]+/).map(x=>x.trim()).filter(Boolean),d=+pDur.value;if(!q||o.length<2||!(d>0))return alert(t('pollErr'));
+ await set(push(ref(db,'polls')),{q,o,votes:Object.fromEntries(o.map((_,i)=>[i,0])),ts:Date.now(),end:Date.now()+d*pU.value});pQ.value=pO.value='';alert('✓')};
 window.delPoll=id=>confirm(t('sure'))&&remove(ref(db,'polls/'+id));
 window.sendSug=async e=>{e.preventDefault();await set(push(ref(db,'suggestions')),{name:sN.value.trim(),hood:sH.value.trim(),cat:+sC.value,desc:sD.value.trim(),contact:sK.value.trim(),rev:false,ts:Date.now()});e.target.reset();sOk.textContent=t('sent');setTimeout(()=>sOk.textContent='',4000);return false};
 window.rev=(id,v)=>update(ref(db,'suggestions/'+id),{rev:v});
 window.delSug=id=>confirm(t('sure'))&&remove(ref(db,'suggestions/'+id));
 window.clearSug=()=>confirm(t('sure'))&&remove(ref(db,'suggestions'));
-const comp=f=>new Promise(r=>{if(!f)return r('');const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.72))};im.src=fr.result};fr.readAsDataURL(f)});
+const comp=(f,mx=900)=>new Promise(r=>{if(!f)return r('');const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,mx/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.72))};im.src=fr.result};fr.readAsDataURL(f)});
 window.saveAch=async()=>{if(!aTitle.value.trim())return alert(t('ttl'));const id=aId.value||push(ref(db,'achievements')).key,o=ACH[id]||{};
  const i1=await comp(aF1.files[0])||o.i1||'',i2=await comp(aF2.files[0])||o.i2||'';
  await set(ref(db,'achievements/'+id),{title:aTitle.value.trim(),desc:aDesc.value.trim(),cat:+aCat.value,i1,i2,ts:o.ts||Date.now()});resetAch()};
@@ -231,6 +277,39 @@ window.editAch=id=>{const x=ACH[id];aId.value=id;aTitle.value=x.title;aDesc.valu
 window.delAch=id=>confirm(t('sure'))&&remove(ref(db,'achievements/'+id));
 addEventListener('unhandledrejection',e=>alert((e.reason&&e.reason.message)||e.reason)); // surface Firebase errors (e.g. permission denied)
 onValue(ref(db,'achievements'),s=>{ACH=s.val()||{};render()});
+// ---- poll countdown
+const fmtT=ms=>{const x=Math.floor(ms/1000),d=Math.floor(x/86400),h=Math.floor(x%86400/3600),m=Math.floor(x%3600/60);return(d?d+'d ':'')+(h?h+'h ':'')+m+'m '+x%60+'s'};
+function tick(){const el=$$('[data-end]');if(el.some(e=>+e.dataset.end<=Date.now()))return render();el.forEach(e=>e.textContent=fmtT(e.dataset.end-Date.now()))}
+setInterval(tick,1000);
+// ---- disability chat: dreq (meta) / dids (ID photo, admin only) / dmsg (messages)
+let RID=localStorage.rid||'',CR=null,CM={},DREQ={},SEL='',AM={},AID='',unC=[],unR=null,unM=null;
+const bub=(m,me)=>Object.values(m).sort((a,b)=>a.ts-b.ts).map(x=>`<div class="flex ${x.f==me?'justify-end':''} mb-1"><div class="max-w-[80%] rounded-2xl px-3 py-1.5 text-sm ${x.f==me?'bg-[var(--acc)] text-white':'bg-white'}">${esc(x.x)}<div class="text-[10px] opacity-60">${new Date(x.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div></div>`).join('');
+const fill=(el,h)=>{const n=el.scrollHeight-el.scrollTop-el.clientHeight<60;el.innerHTML=h;if(n)el.scrollTop=el.scrollHeight};
+function watchC(){unC.forEach(u=>u());unC=[];if(!RID)return;
+ unC=[onValue(ref(db,'dreq/'+RID),s=>{CR=s.val();if(!CR){localStorage.removeItem('rid');RID=''}renderDis()}),onValue(ref(db,'dmsg/'+RID),s=>{CM=s.val()||{};renderDis()})]}
+function admWatch(){if(ADM&&!unR)unR=onValue(ref(db,'dreq'),s=>{DREQ=s.val()||{};renderDis()});
+ if(!ADM&&unR){unR();unR=null;DREQ={};SEL='';unM&&unM();unM=null}}
+function renderDis(){
+ $('#dCit').classList.toggle('hidden',ADM);const has=!!RID;$('#dStart').classList.toggle('hidden',has);$('#dChatC').classList.toggle('hidden',!has);
+ if(has){const st=CR?.status||'pending';$('#dSt').textContent=t(st=='pending'?'wait':st=='active'?'live':'closedT');$('#cIn').disabled=$('#cBtn').disabled=st!='active';fill($('#cMsgs'),bub(CM,'c'));$('#dNewB').classList.toggle('hidden',st!='closed')}
+ $('#dAdm').classList.toggle('hidden',!ADM);if(!ADM)return;
+ $('#dList').innerHTML=Object.entries(DREQ).sort((a,b)=>b[1].ts-a[1].ts).map(([id,r])=>`<button onclick="admSel('${id}')" class="card w-full text-start p-3 ${id==SEL?'ring-2 ring-[var(--acc)]':''}"><div class="flex justify-between"><b>${esc(r.name)}</b><span class="chip">${t(r.status=='pending'?'pend':r.status=='active'?'live':'closedT')}</span></div><div class="text-xs text-[var(--mut)]">${esc(r.contact||'')} · ${new Date(r.ts).toLocaleString()}</div></button>`).join('')||`<p class="text-[var(--mut)]">${t('noReq')}</p>`;
+ const r=DREQ[SEL];$('#aPanel').classList.toggle('hidden',!r);if(!r)return;
+ $('#aInfo').innerHTML=`<div class="flex justify-between items-start gap-2 mb-2"><div><b>${esc(r.name)}</b><div class="text-xs text-[var(--mut)]">${esc(r.contact||'')}</div></div><div class="flex gap-1 flex-wrap text-sm">${r.status=='pending'?`<button class="btn" onclick="dSet('active')">${t('start')}</button>`:''}${r.status=='active'?`<button class="btn alt" onclick="dSet('closed')">${t('close')}</button>`:''}<button class="chip" onclick="dDelId()">${t('delId')}</button><button class="chip" onclick="dDelReq()">${t('del')}</button></div></div>${AID?`<img src="${AID}" class="w-full max-h-72 object-contain bg-white rounded-xl mb-2">`:`<p class="text-sm text-[var(--mut)] mb-2">${t('idGone')}</p>`}`;
+ fill($('#aMsgs'),bub(AM,'m'));$('#mIn').disabled=$('#mBtn').disabled=r.status!='active'}
+window.dOpen=()=>dForm.classList.toggle('hidden');
+window.dSend=async e=>{e.preventDefault();const img=await comp(dF.files[0],1200);if(!img)return;const id=push(ref(db,'dreq')).key,now=Date.now();
+ await set(ref(db,'dids/'+id),img);await set(ref(db,'dreq/'+id),{name:dN.value.trim(),contact:dK.value.trim(),status:'pending',ts:now});
+ if(dM.value.trim())await set(push(ref(db,'dmsg/'+id)),{f:'c',x:dM.value.trim(),ts:now});
+ RID=localStorage.rid=id;watchC();e.target.reset();dForm.classList.add('hidden');return false};
+window.cSend=()=>{const x=cIn.value.trim();if(!x||CR?.status!='active')return;set(push(ref(db,'dmsg/'+RID)),{f:'c',x,ts:Date.now()});cIn.value=''};
+window.mSend=()=>{const x=mIn.value.trim();if(!x||DREQ[SEL]?.status!='active')return;set(push(ref(db,'dmsg/'+SEL)),{f:'m',x,ts:Date.now()});mIn.value=''};
+window.admSel=id=>{SEL=id;AID='';AM={};unM&&unM();unM=onValue(ref(db,'dmsg/'+id),s=>{AM=s.val()||{};renderDis()});get(ref(db,'dids/'+id)).then(s=>{AID=s.val()||'';renderDis()});renderDis()};
+window.dSet=st=>update(ref(db,'dreq/'+SEL),{status:st});
+window.dDelId=async()=>{if(!confirm(t('sure')))return;await remove(ref(db,'dids/'+SEL));AID='';renderDis()};
+window.dDelReq=async()=>{if(!confirm(t('sure')))return;const id=SEL;SEL='';unM&&unM();unM=null;await Promise.all(['dreq','dids','dmsg'].map(p=>remove(ref(db,p+'/'+id))));renderDis()};
+window.dNew=()=>{localStorage.removeItem('rid');RID='';CR=null;CM={};watchC();renderDis()};
+watchC();
 // ---- Firebase listeners (+ seeding when empty)
 onValue(ref(db,'tasks'),s=>{TASKS=s.val()||{};render()});
 onValue(ref(db,'polls'),s=>{POLLS=s.val()||{};render()});
@@ -238,7 +317,7 @@ onValue(ref(db,'ratings'),s=>{RAT=s.val()||{};render()});
 onValue(ref(db,'suggestions'),s=>{SUG=s.val()||{};render()},()=>{}); // admin-only reads should be enforced via Firebase rules
 get(ref(db,'meta/seeded')).then(async s=>{if(s.val())return;const u={'meta/seeded':true};
  SEED_T.forEach(x=>u['tasks/'+push(ref(db,'tasks')).key]={title:x[0],cat:x[1],tf:x[2],pr:x[3],status:x[4],cap:x[5],ts:Date.now()});
- u['polls/'+push(ref(db,'polls')).key]={...SEED_P,votes:{},ts:Date.now()};await update(ref(db),u)}).catch(()=>{});
+ u['polls/'+push(ref(db,'polls')).key]={...SEED_P,votes:{},ts:Date.now(),end:Date.now()+6048e5};await update(ref(db),u)}).catch(()=>{});
 applyLang();
 </script>
 </body>
