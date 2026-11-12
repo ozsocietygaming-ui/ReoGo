@@ -142,6 +142,30 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
    <div class="flex gap-2"><input id="mIn" class="inp" data-p="typeMsg" onkeydown="event.key==='Enter'&&mSend()"><button id="mBtn" class="btn" onclick="mSend()"><i class="fa-solid fa-paper-plane rtl:-scale-x-100"></i></button></div></div>
  </div>
 </section>
+
+<!-- SERVICES TAB -->
+<section id="v6" class="hidden">
+ <h2 class="text-xl font-extrabold mb-1" data-i="n7"></h2><p class="text-[var(--mut)] mb-4" data-i="svcSub"></p>
+ <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="svcs"></div>
+</section>
+<!-- ANNOUNCEMENTS TAB -->
+<section id="v7" class="hidden">
+ <h2 class="text-xl font-extrabold mb-3" data-i="n8"></h2>
+ <div id="admAnn" class="card p-4 mb-5 hidden">
+  <h3 class="font-bold mb-2" data-i="addAnn"></h3><input type="hidden" id="annId">
+  <div class="grid md:grid-cols-2 gap-2">
+   <input id="annT" class="inp" data-p="ttl"><select id="annTy" class="inp"></select>
+   <textarea id="annD" rows="4" class="inp md:col-span-2" data-p="desc"></textarea>
+   <label class="text-sm"><span data-i="dlLabel"></span><input id="annDl" type="datetime-local" class="inp mt-1"></label>
+   <label class="text-sm"><span data-i="imgs"></span><input id="annF" type="file" accept="image/*" multiple class="block mt-2"></label>
+  </div>
+  <div class="mt-3 flex gap-2"><button class="btn" onclick="saveAnn()" data-i="publish"></button><button class="btn alt" onclick="resetAnn()" data-i="cancel"></button></div>
+ </div>
+ <div class="grid md:grid-cols-2 gap-4" id="annList"></div>
+ <h2 class="text-xl font-extrabold mt-10 mb-3" data-i="annEnded"></h2>
+ <div class="grid md:grid-cols-2 gap-4" id="annEnd"></div>
+</section>
+<div id="lb" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4" onclick="this.classList.replace('flex','hidden')"><img id="lbImg" class="max-h-full max-w-full rounded-xl"></div>
 </main>
 
 <!-- PIN modal -->
@@ -161,7 +185,7 @@ const db=getDatabase(initializeApp({apiKey:"AIzaSyDMl6McLdDGBo6k1qJ0rtrY5JgdaesH
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PIN='2026',LG=['ar','fr','en'];
-let ACH={},I=Math.max(0,LG.indexOf(localStorage.lang||'ar')),ADM=sessionStorage.adm==='1',TAB=0,FIL='all',TASKS={},POLLS={},RAT={},SUG={};
+let ANN={},ACH={},I=Math.max(0,LG.indexOf(localStorage.lang||'ar')),ADM=sessionStorage.adm==='1',TAB=0,FIL='all',TASKS={},POLLS={},RAT={},SUG={};
 const uid=localStorage.uid||(localStorage.uid=Math.random().toString(36).slice(2));
 // ---- dictionary: [ar, fr, en]
 const T={
@@ -192,6 +216,11 @@ dCons:['أوافق على إرسال صورة بطاقتي إلى فريق رئ�
 wait:['⏳ في انتظار قبول رئيس البلدية','⏳ En attente du maire','⏳ Waiting for the mayor'],live:['🟢 المحادثة مفتوحة','🟢 Discussion ouverte','🟢 Chat open'],closedT:['المحادثة مغلقة','Discussion terminée','Chat closed'],pend:['قيد الانتظار','En attente','Pending'],
 newReq:['طلب جديد','Nouvelle demande','New request'],typeMsg:['اكتب رسالة…','Écrire un message…','Type a message…'],reqs:['طلبات المحادثة','Demandes de discussion','Chat requests'],noReq:['لا توجد طلبات','Aucune demande','No requests'],
 start:['بدء المحادثة','Démarrer','Start chat'],close:['إنهاء','Clore','End chat'],delId:['حذف صورة البطاقة','Supprimer la pièce','Delete ID photo'],idGone:['تم حذف صورة البطاقة','Pièce supprimée','ID photo deleted'],
+n7:['رقمنة وخدمات','Numérisation & services','Digital Services'],n8:['إعلانات البلدية','Annonces communales','Municipal Notices'],
+svcSub:['خدمات إدارية رسمية عبر الإنترنت — بدون تنقل','Services administratifs officiels en ligne — sans déplacement','Official online administrative services — no trip needed'],open:['افتح الخدمة','Ouvrir le service','Open service'],
+addAnn:['نشر إعلان','Publier une annonce','Post a notice'],dlLabel:['آخر أجل (اختياري)','Date limite (facultatif)','Deadline (optional)'],imgs:['صور (حتى 4)','Photos (jusqu’à 4)','Photos (up to 4)'],
+annEnded:['إعلانات منتهية','Annonces clôturées','Closed notices'],noAnn:['لا توجد إعلانات','Aucune annonce','No notices'],closedL:['انتهى في','Clôturé le','Closed'],
+ty_tender:['مناقصة','Appel d’offres','Tender'],ty_auction:['مزايدة','Enchère','Auction'],ty_rental:['كراء','Location','Rental'],ty_general:['إعلان','Avis','Notice'],
 pollErr:['أدخل سؤالًا وخيارين على الأقل (كل خيار في سطر)','Saisissez une question et 2 options minimum (une par ligne)','Enter a question and at least 2 options (one per line)']};
 const PIL=[['تحسين البنية التحتية','Infrastructure','Infrastructure'],['دعم الشباب والرياضة','Jeunesse & sport','Youth & Sports'],['حماية البيئة والفضاءات الخضراء','Environnement & espaces verts','Environment & Green Spaces'],['قرب الإدارة من المواطن','Administration de proximité','Administration Closer to Citizens'],['تعزيز الأمن والاستقرار','Sécurité & stabilité','Security & Stability']];
 const ICO=['road','futbol','leaf','handshake','shield-halved'];
@@ -208,17 +237,17 @@ const ST={planned:'#8A8078',progress:'#B5694B',done:'#7A8450'};
 function applyLang(){
  document.documentElement.lang=LG[I];document.documentElement.dir=I?'ltr':'rtl';localStorage.lang=LG[I];
  $$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('[data-p]').forEach(e=>e.placeholder=t(e.dataset.p)||({sName:1})&&T[e.dataset.p]?t(e.dataset.p):'');
- $('#tabs').innerHTML=['n1','n2','npoll','n3','n4','n6'].map((k,i)=>`<button class="tab whitespace-nowrap ${i==TAB?'on':''}" onclick="go(${i})">${t(k)}</button>`).join('');
+ $('#tabs').innerHTML=['n1','n2','npoll','n3','n4','n6','n7','n8'].map((k,i)=>`<button class="tab whitespace-nowrap ${i==TAB?'on':''}" onclick="go(${i})">${t(k)}</button>`).join('');
  $('#langs').innerHTML=['عربي','Français','English'].map((l,i)=>`<button class="px-2 py-1 ${i==I?'bg-[var(--acc)] text-white':''}" onclick="setL(${i})">${l}</button>`).join('');
  const opt=(a,f)=>a.map((x,i)=>`<option value="${f?f[i]:i}">${x}</option>`).join('');
  const keep=(s,h)=>{const v=$(s).value;$(s).innerHTML=h;if(v)$(s).value=v};
- keep('#tCat',opt(PIL.map(p=>p[I])));keep('#sC',opt(PIL.map(p=>p[I])));keep('#aCat',opt(PIL.map(p=>p[I])));keep('#pU',opt([t('uh'),t('ud'),t('um')],[3600000,86400000,60000]));
+ keep('#tCat',opt(PIL.map(p=>p[I])));keep('#sC',opt(PIL.map(p=>p[I])));keep('#aCat',opt(PIL.map(p=>p[I])));keep('#annTy',opt(['tender','auction','rental','general'].map(k=>t('ty_'+k)),['tender','auction','rental','general']));keep('#pU',opt([t('uh'),t('ud'),t('um')],[3600000,86400000,60000]));
  keep('#tTf',opt(['daily','weekly','monthly','term'].map(t),['daily','weekly','monthly','term']));keep('#tSt',opt(['planned','progress','done'].map(t),['planned','progress','done']));
  $('#admBtn span').textContent=ADM?t('out'):t('admin');admWatch();
  $('#creds').innerHTML=CRED.map(c=>`<div class="card p-5"><div class="text-2xl mb-2" style="color:var(--acc)"><i class="fa-solid ${c[0].slice(3)}"></i></div><h3 class="font-bold mb-2">${c[1][I]}</h3><ul class="space-y-1 text-sm">${c[2][I].map(x=>`<li><i class="fa-solid fa-circle-check text-[var(--olive)] me-1"></i>${x}</li>`).join('')}</ul></div>`).join('');
  $('#pillars').innerHTML=PIL.map((p,i)=>`<div class="card p-4 text-center"><div class="text-3xl mb-2" style="color:var(--olive)"><i class="fa-solid fa-${ICO[i]}"></i></div><div class="font-semibold text-sm">${p[I]}</div></div>`).join('');
  $('#filters').innerHTML=['all','planned','progress','done'].map(f=>`<button class="chip !py-1 ${f==FIL?'!bg-[var(--acc)] !text-white':''}" onclick="FIL='${f}';window.render()">${t(f)}</button>`).join('');
- render();
+ renderSvc();render();
 }
 window.FIL=FIL;Object.defineProperty(window,'FIL',{get:()=>FIL,set:v=>FIL=v});
 window.setL=i=>{I=i;applyLang()};
@@ -244,7 +273,7 @@ window.render=function(){
   <div class="text-xs text-[var(--mut)] flex justify-between gap-2"><span>${tot} ${t('voted')}${p.end?' · '+(lv?`⏳ <b data-end="${p.end}"></b>`:t('endedL')+' '+new Date(p.end).toLocaleString()):''}</span>${ADM?`<button onclick="delPoll('${id}')" class="underline">${t('del')}</button>`:''}</div></div>`};
  $('#polls').innerHTML=pe.filter(([,p])=>live(p)).map(([id,p])=>pc(id,p)).join('')||`<p class="text-[var(--mut)]">${t('noAct')}</p>`;
  $('#pollsEnded').innerHTML=pe.filter(([,p])=>!live(p)).sort((a,b)=>b[1].end-a[1].end).map(([id,p])=>pc(id,p)).join('')||`<p class="text-[var(--mut)]">${t('noEnd')}</p>`;
- tick();renderDis();
+ tick();renderDis();renderAnn();
  const all=Object.values(TASKS),dn=all.filter(x=>x.status=='done').length,av=all.length?Math.round(all.reduce((a,x)=>a+x.pr,0)/all.length):0;
  $('#counters').innerHTML=[[all.length,'k1'],[dn,'k2'],[Object.keys(ACH).length,'k5'],[Object.keys(SUG).length||'—','k4']].map(k=>`<div class="card p-4 text-center"><div class="text-3xl font-extrabold" style="color:var(--acc)">${k[0]}</div><div class="text-xs text-[var(--mut)]">${t(k[1])}</div></div>`).join('');
  const ac=Object.entries(ACH).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
@@ -277,6 +306,28 @@ window.editAch=id=>{const x=ACH[id];aId.value=id;aTitle.value=x.title;aDesc.valu
 window.delAch=id=>confirm(t('sure'))&&remove(ref(db,'achievements/'+id));
 addEventListener('unhandledrejection',e=>alert((e.reason&&e.reason.message)||e.reason)); // surface Firebase errors (e.g. permission denied)
 onValue(ref(db,'achievements'),s=>{ACH=s.val()||{};render()});
+// ---- digital services
+const SVC=[['fa-baby','#B5694B',['استخراج شهادة الميلاد أونلاين','Extraire l’acte de naissance en ligne','Extract Birth Certificate Online'],'https://etatcivil.interieur.gov.dz/ActeNaissance/'],
+['fa-scale-balanced','#6B5B4E',['طلب واستخراج صحيفة السوابق القضائية عبر الإنترنت','Demander le casier judiciaire en ligne','Request Criminal Record Online'],'https://e-casier.mjustice.dz/'],
+['fa-ring','#A8788A',['استخراج عقد الزواج (Acte de mariage) أونلاين','Extraire l’acte de mariage en ligne','Extract Marriage Certificate Online'],'https://etatcivil.interieur.gov.dz/ActeMariage/'],
+['fa-dove','#7A8450',['استخراج شهادة الوفاة (Acte de décès)','Extraire l’acte de décès','Extract Death Certificate'],'https://etatcivil.interieur.gov.dz/ActeDeces/'],
+['fa-briefcase','#4F7A8A',['استخراج شهادة CASNOS / عدم الانتساب','Attestation CASNOS / non-affiliation','CASNOS Certificate / Non-Affiliation'],'https://damancom.casnos.dz/non-affiliation'],
+['fa-hand-holding-medical','#5E8C6A',['استخراج شهادة CNAS — بوابة الهناء','Attestation CNAS — portail El-Hanaa','CNAS Certificate — El-Hanaa Portal'],'https://elhanaa.cnas.dz/index.jsp']];
+function renderSvc(){$('#svcs').innerHTML=SVC.map(x=>`<a href="${x[3]}" target="_blank" rel="noopener noreferrer" class="card p-5 flex items-center gap-4 hover:-translate-y-1 hover:shadow-xl transition group"><span class="w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-white text-2xl" style="background:${x[1]}"><i class="fa-solid ${x[0]}"></i></span><span class="flex-1"><b class="block leading-snug">${x[2][I]}</b><span class="text-xs mt-1 inline-block" style="color:${x[1]}">${t('open')} <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></span></span></a>`).join('')}
+// ---- announcements (tenders, auctions, rentals...)
+const toLocal=ms=>new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+function renderAnn(){$('#admAnn').classList.toggle('hidden',!ADM);const lv=x=>!x.end||x.end>Date.now(),en=Object.entries(ANN);
+ const card=([id,x])=>{const im=x.imgs||[],l=lv(x);return `<div class="card overflow-hidden ${l?'':'opacity-75'}">${im.length?`<div class="grid ${im.length>1?'grid-cols-2':''} gap-0.5">${im.map(u=>`<img src="${u}" onclick="event.stopPropagation();zoom(this.src)" class="w-full h-40 object-cover cursor-zoom-in">`).join('')}</div>`:''}<div class="p-4"><div class="flex justify-between gap-2 flex-wrap"><span class="chip !bg-[var(--acc)] !text-white">${t('ty_'+x.type)}</span>${x.end?(l?`<span class="chip">⏳ <b data-end="${x.end}"></b></span>`:`<span class="chip">${t('closedL')} ${new Date(x.end).toLocaleDateString()}</span>`):''}</div><h3 class="font-bold mt-2">${esc(x.title)}</h3><p class="text-sm whitespace-pre-line text-[var(--mut)]">${esc(x.desc)}</p>${x.end?`<div class="text-xs mt-2"><i class="fa-regular fa-calendar"></i> ${new Date(x.end).toLocaleString()}</div>`:''}${ADM?`<div class="mt-2 text-sm"><button class="chip" onclick="editAnn('${id}')">${t('edit')}</button> <button class="chip" onclick="delAnn('${id}')">${t('del')}</button></div>`:''}</div></div>`};
+ $('#annList').innerHTML=en.filter(([,x])=>lv(x)).sort((a,b)=>(a[1].end||9e15)-(b[1].end||9e15)).map(card).join('')||`<p class="text-[var(--mut)]">${t('noAnn')}</p>`;
+ $('#annEnd').innerHTML=en.filter(([,x])=>!lv(x)).sort((a,b)=>b[1].end-a[1].end).map(card).join('')||`<p class="text-[var(--mut)]">${t('noAnn')}</p>`}
+window.zoom=u=>{lbImg.src=u;lb.classList.replace('hidden','flex')};
+window.saveAnn=async()=>{if(!annT.value.trim())return alert(t('ttl'));const id=annId.value||push(ref(db,'announcements')).key,o=ANN[id]||{};
+ const fs=[...annF.files].slice(0,4),imgs=fs.length?await Promise.all(fs.map(f=>comp(f,900))):(o.imgs||[]);
+ await set(ref(db,'announcements/'+id),{title:annT.value.trim(),desc:annD.value.trim(),type:annTy.value,end:annDl.value?new Date(annDl.value).getTime():0,imgs,ts:o.ts||Date.now()});resetAnn()};
+window.resetAnn=()=>{annId.value=annT.value=annD.value=annDl.value=annF.value=''};
+window.editAnn=id=>{const x=ANN[id];annId.value=id;annT.value=x.title;annD.value=x.desc||'';annTy.value=x.type;annDl.value=x.end?toLocal(x.end):'';scrollTo({top:0,behavior:'smooth'})};
+window.delAnn=id=>confirm(t('sure'))&&remove(ref(db,'announcements/'+id));
+onValue(ref(db,'announcements'),s=>{ANN=s.val()||{};render()});
 // ---- poll countdown
 const fmtT=ms=>{const x=Math.floor(ms/1000),d=Math.floor(x/86400),h=Math.floor(x%86400/3600),m=Math.floor(x%3600/60);return(d?d+'d ':'')+(h?h+'h ':'')+m+'m '+x%60+'s'};
 function tick(){const el=$$('[data-end]');if(el.some(e=>+e.dataset.end<=Date.now()))return render();el.forEach(e=>e.textContent=fmtT(e.dataset.end-Date.now()))}
