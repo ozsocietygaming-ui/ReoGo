@@ -123,10 +123,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
    <p class="text-sm mb-3"><i class="fa-solid fa-shield-halved text-[var(--olive)]"></i> <span data-i="dNote"></span></p>
    <button class="btn" onclick="dOpen()"><i class="fa-solid fa-comments"></i> <span data-i="dBtn"></span></button>
    <form id="dForm" class="hidden mt-4 grid md:grid-cols-2 gap-3" onsubmit="return dSend(event)">
-    <input id="dN" required class="inp" data-p="dName"><input id="dK" class="inp" data-p="contact">
-    <label class="text-sm md:col-span-2"><span data-i="dId"></span> *<input id="dF" type="file" accept="image/*" required class="block mt-1"></label>
-    <textarea id="dM" rows="2" class="inp md:col-span-2" data-p="dMsg1"></textarea>
-    <label class="text-sm md:col-span-2"><input type="checkbox" required> <span data-i="dCons"></span></label>
+    <input id="dN" class="inp md:col-span-2" data-p="dName">
+    <textarea id="dM" required rows="3" class="inp md:col-span-2" data-p="dMsg1"></textarea>
     <div class="md:col-span-2"><button class="btn" data-i="dSubmit"></button></div>
    </form>
   </div>
@@ -213,8 +211,8 @@ foot:['© بلديتي رأس الوادي — حملة محمد بوضياف','
 addAch:['نشر إنجاز','Publier une réalisation','Post an accomplishment'],img1:['صورة (اختيارية) — «قبل» إن وُجدت','Photo (facultative) — « avant » si applicable','Photo (optional) — “before” if any'],img2:['صورة ثانية (اختيارية) — «بعد»','2e photo (facultative) — « après »','2nd photo (optional) — “after”'],
 k5:['إنجازات منشورة','Réalisations','Accomplishments'],noAch:['لا توجد إنجازات منشورة بعد','Aucune réalisation publiée','No accomplishments posted yet'],npoll:['استطلاعات','Sondages','Polls'],n6:['ذوو الاحتياجات الخاصة','Personnes en situation de handicap','People with disabilities'],dur:['المدة','Durée','Duration'],uh:['ساعات','heures','hours'],ud:['أيام','jours','days'],um:['دقائق','minutes','minutes'],
 noAct:['لا توجد استطلاعات نشطة','Aucun sondage actif','No active polls'],noEnd:['لا توجد استطلاعات منتهية','Aucun sondage terminé','No ended polls'],endedH:['الاستطلاعات المنتهية','Sondages terminés','Ended polls'],endedL:['انتهى في','Terminé le','Ended'],
-dSub:['تواصل مباشرة مع رئيس البلدية','Échangez directement avec le maire','Talk directly with the mayor'],dNote:['صورة بطاقتك تُستعمل للتحقق من طلبك فقط ولا يطّلع عليها إلا فريق رئيس البلدية.','Votre pièce d’identité sert uniquement à vérifier votre demande et n’est vue que par l’équipe du maire.','Your ID is used only to verify your request and is seen only by the mayor’s team.'],
-dBtn:['تحدث مع رئيس بلديتك','Discuter avec votre maire','Chat with your mayor'],dName:['الاسم الكامل','Nom complet','Full name'],dId:['صورة بطاقة التعريف / بطاقة المعاق','Photo de la carte d’identité / carte de handicap','Photo of your ID / disability card'],dMsg1:['رسالتك الأولى (اختياري)','Votre premier message (facultatif)','Your first message (optional)'],
+dSub:['تواصل مباشرة مع رئيس البلدية','Échangez directement avec le maire','Talk directly with the mayor'],dNote:['محادثتك مجهولة: لا يُطلب منك اسم ولا وثائق. يستقبل رئيس البلدية طلبك أولًا ثم يقرّر بدء المحادثة.','Votre échange est anonyme : ni nom ni document requis. Le maire reçoit d’abord votre demande puis décide d’ouvrir la discussion.','Your chat is anonymous: no name or documents required. The mayor receives your request first, then decides whether to start the chat.'],
+dBtn:['تحدث مع رئيس بلديتك','Discuter avec votre maire','Chat with your mayor'],dName:['الاسم المستعار (اختياري)','Pseudonyme (facultatif)','Nickname (optional)'],dMsg1:['اكتب رسالتك الأولى للسيد رئيس البلدية','Écrivez votre premier message au maire','Write your first message to the mayor'],anon:['مجهول','Anonyme','Anonymous'],
 dCons:['أوافق على إرسال صورة بطاقتي إلى فريق رئيس البلدية','J’accepte d’envoyer ma pièce à l’équipe du maire','I agree to send my ID to the mayor’s team'],dSubmit:['إرسال الطلب','Envoyer la demande','Send request'],
 wait:['⏳ في انتظار قبول رئيس البلدية','⏳ En attente du maire','⏳ Waiting for the mayor'],live:['🟢 المحادثة مفتوحة','🟢 Discussion ouverte','🟢 Chat open'],closedT:['المحادثة مغلقة','Discussion terminée','Chat closed'],pend:['قيد الانتظار','En attente','Pending'],
 newReq:['طلب جديد','Nouvelle demande','New request'],typeMsg:['اكتب رسالة…','Écrire un message…','Type a message…'],reqs:['طلبات المحادثة','Demandes de discussion','Chat requests'],noReq:['لا توجد طلبات','Aucune demande','No requests'],
@@ -374,18 +372,17 @@ function renderDis(){
  $('#dAdm').classList.toggle('hidden',!ADM);if(!ADM)return;
  $('#dList').innerHTML=Object.entries(DREQ).sort((a,b)=>b[1].ts-a[1].ts).map(([id,r])=>`<button onclick="admSel('${id}')" class="card w-full text-start p-3 ${id==SEL?'ring-2 ring-[var(--acc)]':''}"><div class="flex justify-between"><b>${esc(r.name)}</b><span class="chip">${t(r.status=='pending'?'pend':r.status=='active'?'live':'closedT')}</span></div><div class="text-xs text-[var(--mut)]">${esc(r.contact||'')} · ${new Date(r.ts).toLocaleString()}</div></button>`).join('')||`<p class="text-[var(--mut)]">${t('noReq')}</p>`;
  const r=DREQ[SEL];$('#aPanel').classList.toggle('hidden',!r);if(!r)return;
- $('#aInfo').innerHTML=`<div class="flex justify-between items-start gap-2 mb-2"><div><b>${esc(r.name)}</b><div class="text-xs text-[var(--mut)]">${esc(r.contact||'')}</div></div><div class="flex gap-1 flex-wrap text-sm">${r.status=='pending'?`<button class="btn" onclick="dSet('active')">${t('start')}</button>`:''}${r.status=='active'?`<button class="btn alt" onclick="dSet('closed')">${t('close')}</button>`:''}<button class="chip" onclick="dDelId()">${t('delId')}</button><button class="chip" onclick="dDelReq()">${t('del')}</button></div></div>${AID?`<img src="${AID}" class="w-full max-h-72 object-contain bg-white rounded-xl mb-2">`:`<p class="text-sm text-[var(--mut)] mb-2">${t('idGone')}</p>`}`;
+ $('#aInfo').innerHTML=`<div class="flex justify-between items-start gap-2 mb-2"><div><b>${esc(r.name)}</b><div class="text-xs text-[var(--mut)]">${esc(r.contact||'')}</div></div><div class="flex gap-1 flex-wrap text-sm">${r.status=='pending'?`<button class="btn" onclick="dSet('active')">${t('start')}</button>`:''}${r.status=='active'?`<button class="btn alt" onclick="dSet('closed')">${t('close')}</button>`:''}<button class="chip" onclick="dDelReq()">${t('del')}</button></div></div>`;
  fill($('#aMsgs'),bub(AM,'m'));$('#mIn').disabled=$('#mBtn').disabled=r.status!='active'}
 window.dOpen=()=>dForm.classList.toggle('hidden');
-window.dSend=async e=>{e.preventDefault();const img=await comp(dF.files[0],1200);if(!img)return;const id=push(ref(db,'dreq')).key,now=Date.now();
- await set(ref(db,'dids/'+id),img);await set(ref(db,'dreq/'+id),{name:dN.value.trim(),contact:dK.value.trim(),status:'pending',ts:now});
+window.dSend=async e=>{e.preventDefault();const id=push(ref(db,'dreq')).key,now=Date.now();
+ await set(ref(db,'dreq/'+id),{name:dN.value.trim()||t('anon'),contact:'',status:'pending',ts:now});
  if(dM.value.trim())await set(push(ref(db,'dmsg/'+id)),{f:'c',x:dM.value.trim(),ts:now});
  RID=localStorage.rid=id;watchC();e.target.reset();dForm.classList.add('hidden');return false};
 window.cSend=()=>{const x=cIn.value.trim();if(!x||CR?.status!='active')return;set(push(ref(db,'dmsg/'+RID)),{f:'c',x,ts:Date.now()});cIn.value=''};
 window.mSend=()=>{const x=mIn.value.trim();if(!x||DREQ[SEL]?.status!='active')return;set(push(ref(db,'dmsg/'+SEL)),{f:'m',x,ts:Date.now()});mIn.value=''};
-window.admSel=id=>{SEL=id;AID='';AM={};unM&&unM();unM=onValue(ref(db,'dmsg/'+id),s=>{AM=s.val()||{};renderDis()});get(ref(db,'dids/'+id)).then(s=>{AID=s.val()||'';renderDis()});renderDis()};
+window.admSel=id=>{SEL=id;AID='';AM={};unM&&unM();unM=onValue(ref(db,'dmsg/'+id),s=>{AM=s.val()||{};renderDis()});renderDis()};
 window.dSet=st=>update(ref(db,'dreq/'+SEL),{status:st});
-window.dDelId=async()=>{if(!confirm(t('sure')))return;await remove(ref(db,'dids/'+SEL));AID='';renderDis()};
 window.dDelReq=async()=>{if(!confirm(t('sure')))return;const id=SEL;SEL='';unM&&unM();unM=null;await Promise.all(['dreq','dids','dmsg'].map(p=>remove(ref(db,p+'/'+id))));renderDis()};
 window.dNew=()=>{localStorage.removeItem('rid');RID='';CR=null;CM={};watchC();renderDis()};
 watchC();
