@@ -147,6 +147,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
 <section id="v6" class="hidden">
  <h2 class="text-xl font-extrabold mb-1" data-i="n7"></h2><p class="text-[var(--mut)] mb-4" data-i="svcSub"></p>
  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="svcs"></div>
+ <h2 class="text-xl font-extrabold mt-10 mb-3"><i class="fa-solid fa-phone-volume text-[var(--acc)]"></i> <span data-i="phH"></span></h2>
+ <input class="inp mb-3" data-p="phS" oninput="phq(this.value)">
+ <div class="grid lg:grid-cols-2 gap-3 items-start" id="phones"></div>
 </section>
 <!-- ANNOUNCEMENTS TAB -->
 <section id="v7" class="hidden">
@@ -221,6 +224,7 @@ svcSub:['خدمات إدارية رسمية عبر الإنترنت — بدون
 addAnn:['نشر إعلان','Publier une annonce','Post a notice'],dlLabel:['آخر أجل (اختياري)','Date limite (facultatif)','Deadline (optional)'],imgs:['صور (حتى 4)','Photos (jusqu’à 4)','Photos (up to 4)'],
 annEnded:['إعلانات منتهية','Annonces clôturées','Closed notices'],noAnn:['لا توجد إعلانات','Aucune annonce','No notices'],closedL:['انتهى في','Clôturé le','Closed'],
 ty_tender:['مناقصة','Appel d’offres','Tender'],ty_auction:['مزايدة','Enchère','Auction'],ty_rental:['كراء','Location','Rental'],ty_general:['إعلان','Avis','Notice'],
+phH:['أرقام الطوارئ والمصالح الهامة — رأس الوادي','Numéros d’urgence et services utiles — Ras El Oued','Emergency & key numbers — Ras El Oued'],phS:['🔍 ابحث عن مصلحة أو رقم…','🔍 Rechercher un service ou un numéro…','🔍 Search a service or number…'],free:['مجاني','Gratuit','Free'],
 pollErr:['أدخل سؤالًا وخيارين على الأقل (كل خيار في سطر)','Saisissez une question et 2 options minimum (une par ligne)','Enter a question and at least 2 options (one per line)']};
 const PIL=[['تحسين البنية التحتية','Infrastructure','Infrastructure'],['دعم الشباب والرياضة','Jeunesse & sport','Youth & Sports'],['حماية البيئة والفضاءات الخضراء','Environnement & espaces verts','Environment & Green Spaces'],['قرب الإدارة من المواطن','Administration de proximité','Administration Closer to Citizens'],['تعزيز الأمن والاستقرار','Sécurité & stabilité','Security & Stability']];
 const ICO=['road','futbol','leaf','handshake','shield-halved'];
@@ -247,7 +251,7 @@ function applyLang(){
  $('#creds').innerHTML=CRED.map(c=>`<div class="card p-5"><div class="text-2xl mb-2" style="color:var(--acc)"><i class="fa-solid ${c[0].slice(3)}"></i></div><h3 class="font-bold mb-2">${c[1][I]}</h3><ul class="space-y-1 text-sm">${c[2][I].map(x=>`<li><i class="fa-solid fa-circle-check text-[var(--olive)] me-1"></i>${x}</li>`).join('')}</ul></div>`).join('');
  $('#pillars').innerHTML=PIL.map((p,i)=>`<div class="card p-4 text-center"><div class="text-3xl mb-2" style="color:var(--olive)"><i class="fa-solid fa-${ICO[i]}"></i></div><div class="font-semibold text-sm">${p[I]}</div></div>`).join('');
  $('#filters').innerHTML=['all','planned','progress','done'].map(f=>`<button class="chip !py-1 ${f==FIL?'!bg-[var(--acc)] !text-white':''}" onclick="FIL='${f}';window.render()">${t(f)}</button>`).join('');
- renderSvc();render();
+ renderSvc();renderPh();render();
 }
 window.FIL=FIL;Object.defineProperty(window,'FIL',{get:()=>FIL,set:v=>FIL=v});
 window.setL=i=>{I=i;applyLang()};
@@ -314,6 +318,30 @@ const SVC=[['fa-baby','#B5694B',['استخراج شهادة الميلاد أو�
 ['fa-briefcase','#4F7A8A',['استخراج شهادة CASNOS / عدم الانتساب','Attestation CASNOS / non-affiliation','CASNOS Certificate / Non-Affiliation'],'https://damancom.casnos.dz/non-affiliation'],
 ['fa-hand-holding-medical','#5E8C6A',['استخراج شهادة CNAS — بوابة الهناء','Attestation CNAS — portail El-Hanaa','CNAS Certificate — El-Hanaa Portal'],'https://elhanaa.cnas.dz/index.jsp']];
 function renderSvc(){$('#svcs').innerHTML=SVC.map(x=>`<a href="${x[3]}" target="_blank" rel="noopener noreferrer" class="card p-5 flex items-center gap-4 hover:-translate-y-1 hover:shadow-xl transition group"><span class="w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-white text-2xl" style="background:${x[1]}"><i class="fa-solid ${x[0]}"></i></span><span class="flex-1"><b class="block leading-snug">${x[2][I]}</b><span class="text-xs mt-1 inline-block" style="color:${x[1]}">${t('open')} <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></span></span></a>`).join('')}
+// ---- important phone numbers (tap to call)
+const PH=[
+['fa-triangle-exclamation','#B5533C',['الطوارئ والأمن','Urgences & sécurité','Emergency & security'],[
+ ['الشرطة (رقم أخضر)','Police (n° vert)','Police (toll-free)',['1548']],['نجدة الشرطة','Police secours','Police rescue',['17']],['الدرك الوطني','Gendarmerie nationale','National Gendarmerie',['1055']],
+ ['الحماية المدنية (إطفاء ونجدة)','Protection civile','Civil Protection',['14','1021']],['الحماية المدنية — رأس الوادي (مباشر)','Protection civile — Ras El Oued','Civil Protection — Ras El Oued',['035844414']],
+ ['حماية الطفولة والتبليغ','Protection de l’enfance','Child protection',['104']],['مكافحة المخدرات','Lutte contre la drogue','Anti-drug line',['1056']]]],
+['fa-store','#B5694B',['التجارة وحماية المستهلك والمصارف','Commerce, consommateur & banques','Commerce, consumers & banks'],[
+ ['التجارة وحماية المستهلك (تبليغ الغش)','Commerce & fraudes (n° vert)','Trade & consumer fraud (toll-free)',['1020']],['مفتشية التجارة — رأس الوادي','Inspection du commerce — Ras El Oued','Trade inspectorate — Ras El Oued',['035647163']],
+ ['مديرية التجارة — برج بوعريريج','Direction du commerce — BBA','Trade Directorate — BBA',['035682447','035684092']],['حماية المستهلك وقمع الغش (ولائية)','Répression des fraudes (wilaya)','Consumer protection (wilaya)',['035748310','035687588']],
+ ['CNEP — وكالة رأس الوادي','CNEP — agence Ras El Oued','CNEP — Ras El Oued branch',['035633612']],['مصلحة / وكالة — رأس الوادي (الاسم قيد التأكيد)','Service / agence — Ras El Oued (nom à confirmer)','Service / agency — Ras El Oued (name TBC)',['035633480']]]],
+['fa-hand-holding-heart','#4F7A8A',['الضمان الاجتماعي والتشغيل والتضامن','Sécurité sociale, emploi, solidarité','Social security, jobs, solidarity'],[
+ ['CNAS — مركز الدفع','CNAS — centre de paiement','CNAS — payment center',['035633840']],['CASNOS — شباك رأس الوادي','CASNOS — guichet Ras El Oued','CASNOS — Ras El Oued desk',['035633915']],
+ ['ANEM — ملحقة رأس الوادي','ANEM — annexe Ras El Oued','ANEM — Ras El Oued annex',['035634120']],['التضامن الوطني (المسنون والمحتاجون)','Solidarité nationale','National Solidarity',['1527']]]],
+['fa-tree','#7A8450',['الغابات والفلاحة والبيئة','Forêts, agriculture, environnement','Forests, agriculture, environment'],[
+ ['الغابات — حرائق واعتداءات (24/24)','Forêts — incendies (24h/24)','Forestry — fires (24/7)',['1070']],['محافظة الغابات — برج بوعريريج','Conservation des forêts — BBA','Forest Conservation — BBA',['035733098','035733134']],
+ ['المصالح الفلاحية (DSA)','Services agricoles (DSA)','Agricultural Services (DSA)',['035733110']],['المفتشية البيطرية','Inspection vétérinaire','Veterinary inspectorate',['035733245']],
+ ['مديرية البيئة (تبليغ التلوث)','Direction de l’environnement','Environment Directorate',['035681240']]]],
+['fa-screwdriver-wrench','#6B5B4E',['مصالح خدمية عامة','Services généraux','General services'],[
+ ['الجمارك (تبليغ التهريب)','Douanes (contrebande)','Customs (smuggling)',['1023']],['الديوان الوطني للتطهير ONA (انسداد الصرف)','ONA — assainissement','ONA — sewage blockages',['1593']]]]];
+let PQ='';const fmtN=n=>n.length==9?n.replace(/(\d{3})(\d\d)(\d\d)(\d\d)/,'$1 $2 $3 $4'):n;
+window.phq=v=>{PQ=v;renderPh()};
+function renderPh(){const q=PQ.trim().toLowerCase(),d=q.replace(/\s/g,'');
+ $('#phones').innerHTML=PH.map((c,ci)=>{const rows=c[3].filter(r=>!q||r[I].toLowerCase().includes(q)||r[3].some(n=>n.includes(d)));if(!rows.length)return'';
+ return `<details class="card overflow-hidden" ${q||ci==0?'open':''}><summary class="flex items-center gap-3 p-4 cursor-pointer font-bold"><span class="w-10 h-10 shrink-0 rounded-xl text-white flex items-center justify-center" style="background:${c[1]}"><i class="fa-solid ${c[0]}"></i></span><span class="flex-1">${c[2][I]}</span><span class="chip">${rows.length}</span></summary><div class="px-3 pb-3 space-y-2">${rows.map(r=>`<div class="bg-white rounded-xl p-3 flex flex-wrap items-center justify-between gap-2"><span class="text-sm font-semibold flex-1 min-w-[9rem]">${r[I]}</span><span class="flex gap-2 flex-wrap items-center">${r[3][0].length<=4?`<span class="chip">${t('free')}</span>`:''}${r[3].map(n=>`<a href="tel:${n}" dir="ltr" class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-white text-sm font-bold hover:brightness-90" style="background:${c[1]}"><i class="fa-solid fa-phone"></i>${fmtN(n)}</a>`).join('')}</span></div>`).join('')}</div></details>`}).join('')}
 // ---- announcements (tenders, auctions, rentals...)
 const toLocal=ms=>new Date(ms-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
 function renderAnn(){$('#admAnn').classList.toggle('hidden',!ADM);const lv=x=>!x.end||x.end>Date.now(),en=Object.entries(ANN);
