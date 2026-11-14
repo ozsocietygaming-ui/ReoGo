@@ -28,7 +28,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
   <nav class="flex gap-1 order-3 w-full md:w-auto md:order-none overflow-x-auto" id="tabs"></nav>
   <div class="flex items-center gap-2 text-sm">
    <div id="langs" class="flex rounded-xl overflow-hidden border border-[#d9d2c7]"></div>
-   <button id="admBtn" class="chip !py-1" onclick="admClick()"><i class="fa-solid fa-lock"></i> <span data-i="admin"></span></button>
+   <button id="admBtn" class="chip !py-1 hidden" onclick="admClick()"><i class="fa-brands fa-google"></i> <span data-i="gsign"></span></button>
   </div>
  </div>
 </header>
@@ -169,24 +169,17 @@ body{background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-se
 <div id="lb" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4" onclick="this.classList.replace('flex','hidden')"><img id="lbImg" class="max-h-full max-w-full rounded-xl"></div>
 </main>
 
-<!-- PIN modal -->
-<div id="pin" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center">
- <div class="card p-6 w-80"><h3 class="font-bold mb-3" data-i="pinH"></h3>
-  <input id="pinIn" type="password" inputmode="numeric" class="inp text-center tracking-widest" onkeydown="event.key==='Enter'&&pinOk()">
-  <p id="pinErr" class="text-red-700 text-sm mt-1 h-5"></p>
-  <div class="flex gap-2 mt-2"><button class="btn" onclick="pinOk()" data-i="login"></button><button class="btn alt" onclick="pin.classList.replace('flex','hidden')" data-i="cancel"></button></div>
- </div>
-</div>
 <footer class="text-center text-xs text-[var(--mut)] py-6" data-i="foot"></footer>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {getDatabase,ref,onValue,set,push,update,remove,get,runTransaction} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-const db=getDatabase(initializeApp({apiKey:"AIzaSyDMl6McLdDGBo6k1qJ0rtrY5JgdaesH32I",authDomain:"reogo-c4cc7.firebaseapp.com",databaseURL:"https://reogo-c4cc7-default-rtdb.europe-west1.firebasedatabase.app",projectId:"reogo-c4cc7",storageBucket:"reogo-c4cc7.appspot.com",messagingSenderId:"648131253576",appId:"1:648131253576:web:012f98f309c37081fd8f7d",measurementId:"G-ZJHGS4FQDV"}));
+const app=initializeApp({apiKey:"AIzaSyDMl6McLdDGBo6k1qJ0rtrY5JgdaesH32I",authDomain:"reogo-c4cc7.firebaseapp.com",databaseURL:"https://reogo-c4cc7-default-rtdb.europe-west1.firebasedatabase.app",projectId:"reogo-c4cc7",storageBucket:"reogo-c4cc7.appspot.com",messagingSenderId:"648131253576",appId:"1:648131253576:web:012f98f309c37081fd8f7d",measurementId:"G-ZJHGS4FQDV"}),db=getDatabase(app),auth=getAuth(app);
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const PIN='2026',LG=['ar','fr','en'];
-let ANN={},ACH={},I=Math.max(0,LG.indexOf(localStorage.lang||'ar')),ADM=sessionStorage.adm==='1',TAB=0,FIL='all',TASKS={},POLLS={},RAT={},SUG={};
+const LG=['ar','fr','en'];
+let ANN={},ACH={},I=Math.max(0,LG.indexOf(localStorage.lang||'ar')),ADM=false,TAB=0,FIL='all',TASKS={},POLLS={},RAT={},SUG={};
 const uid=localStorage.uid||(localStorage.uid=Math.random().toString(36).slice(2));
 // ---- dictionary: [ar, fr, en]
 const T={
@@ -223,6 +216,7 @@ addAnn:['نشر إعلان','Publier une annonce','Post a notice'],dlLabel:['آ�
 annEnded:['إعلانات منتهية','Annonces clôturées','Closed notices'],noAnn:['لا توجد إعلانات','Aucune annonce','No notices'],closedL:['انتهى في','Clôturé le','Closed'],
 ty_tender:['مناقصة','Appel d’offres','Tender'],ty_auction:['مزايدة','Enchère','Auction'],ty_rental:['كراء','Location','Rental'],ty_general:['إعلان','Avis','Notice'],
 phH:['أرقام الطوارئ والمصالح الهامة — رأس الوادي','Numéros d’urgence et services utiles — Ras El Oued','Emergency & key numbers — Ras El Oued'],phS:['🔍 ابحث عن مصلحة أو رقم…','🔍 Rechercher un service ou un numéro…','🔍 Search a service or number…'],free:['مجاني','Gratuit','Free'],
+gsign:['دخول بحساب Google','Connexion Google','Sign in with Google'],denied:['هذا الحساب غير مخوّل للدخول كمسؤول','Ce compte n’est pas autorisé','This account is not authorized as admin'],
 pollErr:['أدخل سؤالًا وخيارين على الأقل (كل خيار في سطر)','Saisissez une question et 2 options minimum (une par ligne)','Enter a question and at least 2 options (one per line)']};
 const PIL=[['تحسين البنية التحتية','Infrastructure','Infrastructure'],['دعم الشباب والرياضة','Jeunesse & sport','Youth & Sports'],['حماية البيئة والفضاءات الخضراء','Environnement & espaces verts','Environment & Green Spaces'],['قرب الإدارة من المواطن','Administration de proximité','Administration Closer to Citizens'],['تعزيز الأمن والاستقرار','Sécurité & stabilité','Security & Stability']];
 const ICO=['road','futbol','leaf','handshake','shield-halved'];
@@ -245,7 +239,7 @@ function applyLang(){
  const keep=(s,h)=>{const v=$(s).value;$(s).innerHTML=h;if(v)$(s).value=v};
  keep('#tCat',opt(PIL.map(p=>p[I])));keep('#sC',opt(PIL.map(p=>p[I])));keep('#aCat',opt(PIL.map(p=>p[I])));keep('#annTy',opt(['tender','auction','rental','general'].map(k=>t('ty_'+k)),['tender','auction','rental','general']));keep('#pU',opt([t('uh'),t('ud'),t('um')],[3600000,86400000,60000]));
  keep('#tTf',opt(['daily','weekly','monthly','term'].map(t),['daily','weekly','monthly','term']));keep('#tSt',opt(['planned','progress','done'].map(t),['planned','progress','done']));
- $('#admBtn span').textContent=ADM?t('out'):t('admin');admWatch();
+ $('#admBtn span').textContent=ADM?t('out'):t('gsign');admWatch();
  $('#creds').innerHTML=CRED.map(c=>`<div class="card p-5"><div class="text-2xl mb-2" style="color:var(--acc)"><i class="fa-solid ${c[0].slice(3)}"></i></div><h3 class="font-bold mb-2">${c[1][I]}</h3><ul class="space-y-1 text-sm">${c[2][I].map(x=>`<li><i class="fa-solid fa-circle-check text-[var(--olive)] me-1"></i>${x}</li>`).join('')}</ul></div>`).join('');
  $('#pillars').innerHTML=PIL.map((p,i)=>`<div class="card p-4 text-center"><div class="text-3xl mb-2" style="color:var(--olive)"><i class="fa-solid fa-${ICO[i]}"></i></div><div class="font-semibold text-sm">${p[I]}</div></div>`).join('');
  $('#filters').innerHTML=['all','planned','progress','done'].map(f=>`<button class="chip !py-1 ${f==FIL?'!bg-[var(--acc)] !text-white':''}" onclick="FIL='${f}';window.render()">${t(f)}</button>`).join('');
@@ -255,8 +249,13 @@ window.FIL=FIL;Object.defineProperty(window,'FIL',{get:()=>FIL,set:v=>FIL=v});
 window.setL=i=>{I=i;applyLang()};
 window.go=i=>{TAB=i;$$('main>section').forEach((s,j)=>s.classList.toggle('hidden',j!=i));$$('#tabs .tab').forEach((b,j)=>b.classList.toggle('on',j==i))};
 // ---- admin
-window.admClick=()=>{if(ADM){ADM=false;sessionStorage.adm='0';render();applyLang()}else{pin.classList.replace('hidden','flex');pinIn.value='';pinIn.focus()}};
-window.pinOk=()=>{if(pinIn.value===PIN){ADM=true;sessionStorage.adm='1';pin.classList.replace('flex','hidden');applyLang()}else pinErr.textContent=t('pinBad')};
+// ---- admin access: open the site with ?admin (or #admin) and sign in with an allowed Google account
+const OK=['armseciruty@gmail.com','ozsocietygaming@gmail.com'],URLADM=new URLSearchParams(location.search).has('admin')||location.hash.toLowerCase().includes('admin');
+if(URLADM)admBtn.classList.remove('hidden');
+window.admClick=async()=>{if(auth.currentUser)return signOut(auth);try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){alert(e.message)}};
+onAuthStateChanged(auth,u=>{const ok=!!u&&URLADM&&u.emailVerified&&OK.includes((u.email||'').toLowerCase());
+ if(u&&URLADM&&!ok){alert(t('denied'));signOut(auth);return}
+ ADM=ok;applyLang()});
 // ---- render dynamic
 const avg=id=>{const r=Object.values(RAT[id]||{});return r.length?(r.reduce((a,b)=>a+b,0)/r.length):0};
 window.render=function(){
@@ -364,7 +363,9 @@ const bub=(m,me)=>Object.values(m).sort((a,b)=>a.ts-b.ts).map(x=>`<div class="fl
 const fill=(el,h)=>{const n=el.scrollHeight-el.scrollTop-el.clientHeight<60;el.innerHTML=h;if(n)el.scrollTop=el.scrollHeight};
 function watchC(){unC.forEach(u=>u());unC=[];if(!RID)return;
  unC=[onValue(ref(db,'dreq/'+RID),s=>{CR=s.val();if(!CR){localStorage.removeItem('rid');RID=''}renderDis()}),onValue(ref(db,'dmsg/'+RID),s=>{CM=s.val()||{};renderDis()})]}
-function admWatch(){if(ADM&&!unR)unR=onValue(ref(db,'dreq'),s=>{DREQ=s.val()||{};renderDis()});
+let unS=null;
+function admWatch(){if(ADM&&!unS)unS=onValue(ref(db,'suggestions'),s=>{SUG=s.val()||{};render()});if(!ADM&&unS){unS();unS=null;SUG={}}
+ if(ADM&&!unR)unR=onValue(ref(db,'dreq'),s=>{DREQ=s.val()||{};renderDis()});
  if(!ADM&&unR){unR();unR=null;DREQ={};SEL='';unM&&unM();unM=null}}
 function renderDis(){
  $('#dCit').classList.toggle('hidden',ADM);const has=!!RID;$('#dStart').classList.toggle('hidden',has);$('#dChatC').classList.toggle('hidden',!has);
@@ -390,7 +391,6 @@ watchC();
 onValue(ref(db,'tasks'),s=>{TASKS=s.val()||{};render()});
 onValue(ref(db,'polls'),s=>{POLLS=s.val()||{};render()});
 onValue(ref(db,'ratings'),s=>{RAT=s.val()||{};render()});
-onValue(ref(db,'suggestions'),s=>{SUG=s.val()||{};render()},()=>{}); // admin-only reads should be enforced via Firebase rules
 get(ref(db,'meta/seeded')).then(async s=>{if(s.val())return;const u={'meta/seeded':true};
  SEED_T.forEach(x=>u['tasks/'+push(ref(db,'tasks')).key]={title:x[0],cat:x[1],tf:x[2],pr:x[3],status:x[4],cap:x[5],ts:Date.now()});
  u['polls/'+push(ref(db,'polls')).key]={...SEED_P,votes:{},ts:Date.now(),end:Date.now()+6048e5};await update(ref(db),u)}).catch(()=>{});
